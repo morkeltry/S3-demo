@@ -101,7 +101,7 @@ Once you've edited the policy to allow `*` access to the resources in the bucket
 
 ###### Check out the Access Analyzer for your S3 (in your region)
 https://s3.console.aws.amazon.com/s3/access?region=eu-west-2 \
-There won't be an Analyzer set up yet, so click through.
+There won't be an Analyzer set up yet, so click through to create it.
 In the messages at the top of the screen, you should see the blue message 'Scanning Resources'.
 
 We have allowed some public access to the bucket. AWS sees this as a potential security problem but, since we intended this bucket to be for public access, this is fine.  
@@ -109,9 +109,10 @@ We have allowed some public access to the bucket. AWS sees this as a potential s
 You can return to this page at the same URL, but this won't make the Analyzer rescan. To reach the option to Rescan, you need to click on a 'finding' in the lists in one of the tabs.
 If you don't have any 'findings', it means your bucket is secured against public access (but also means that you'll need to delete and recreate the Analyzer in 'Analyzer details' if you want to force a rescan).
 
-
+##### AWS is allowing access, but the last security gateway (CORS) is in your customers' browsers
 In the `picUrls` array `main.js`, comment out the local filename and add a string to the array containing the picture's URL. Now when you access index.html in your browser, the page should try to fetch the picture from the bucket.
-Nothing will show in the browser, however - check why not by opening the browser console. you should find a CORS error (if you find some other error, go back and check your edits to `main.js`). This is one more layer of security we need to deal with, but this one comes from your browser. Even so, we deal with it in the AWS console.
+Nothing will show in the browser, however - check why not by opening the browser console. You should find a CORS error (if you find some other error, go back and check your edits to `main.js`).  
+This is one more layer of security we need to deal with, but this one comes from your browser. Even so, we deal with it in the AWS console.
 Add this CORS policy in the CORS tab:
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -134,31 +135,29 @@ Add this CORS policy in the CORS tab:
 ```
 and, on refreshing the page, your image should show in the browser.
 
+##### Write access
 Now we've verified that our bucket works to read from, we can start to think about write access. We'll be using the file upload.js to upload.
 
-Everything in AWS requires permissions to be explicitly set - often in multiple places.
+Everything in AWS requires permissions to be explicitly set - often in multiple places.  
 But before we can grant permissions, we will need someone to grant permissions to. This could be a Role, but in this case we will create a User.
 
 So:
-Navigate back to the IAM console, create another user and make sure you have a Secret Access Key.
-
-Connect your app up to the first S3 bucket by string the Access Key ID and Secret Access Key in the .env file.
+* Navigate back to the IAM console, create another user and make sure you have a Secret Access Key.
+* Connect your app up to the first S3 bucket by string the Access Key ID and Secret Access Key in the .env file.  
 By convention, `.env` or similar is a file we store environment variables, including secrets, for an app. One of the first things to do when making any app which will be stored on a repository such as Github is to include the name of the `.env` file in the `.gitignore` file (it's a list of files want the `git` software to ignore). This makes sure that the secrets in this file are never pushed to Github where they can be stolen.
 
-Task 1:
+#### Task 1:
 You used the IAM Console to grant the public read access to the first bucket using a Statement generated in JSON by the Policy Generator. You can use the Policy Generator generator to generate the write permissions to the User you created too, but be careful of how much of the generated policy you cut and paste.
 
+#### Task 2 research: Your team of consultants has reached a milestone and will hand over access to the client (ie a different company). How would you grant appropriate permissions to only this app's buckets, to only your client's AWS user?
 
-
-Task 2 research: Your team of consultants has reached a milestone and will hand over access to the client (ie a different company). How would you grant appropriate permissions to only this app's buckets, to only your client's AWS user?
-
-Task 2: pair with someone who is starting task 2 and grant them access to the second bucket.
+#### Task 2: pair with someone who is starting task 2 and grant them access to the second bucket.
 You will need to grant the `GetObject` permission and also the `ListBucket` permissions to your User in your AWS account. `GetObject` is a permission that acts on an object resource, or a set of object resources, and `ListBucket`, as it sounds, acts on an entire bucket. So the resources will have slightly different ARNs.
 
 Grant read access to AWS account ... (Tom)
 You should now have: One bucket which any user on the internet can use, without authenticating, but to which no-one but you can write; Another bucket, which yourself and your client can read and write to, and Tom can read from, with no further permissions than those.
 
-Task 3:
+#### Task 3:
 In `index.js`, delete or comment out each filename in the `picUrls` array. This should make the app search the bucket for files it can display - as long as it has permissions to!
 In upload.js, set bucketName. Notice that this is a variable for AWS to process internally, passed ot it by the SDK. So this is just the name of the bucket, not an internet-accessible URL.
 Grab some more pictures from the internet and store them in the assets/ folder.
@@ -168,16 +167,17 @@ Run the upload app (`node upload.js`), to upload pictures to your pair's bucket 
 NB: In a large scale system, we would Block Public Access even to an S3 bucket which we _want_ the public to access, and the public access point would instead go through CloudFront. Mediating requests through CloudFront means you have full control over access control and logging and, especially, load-balancing (which you could not use when requests go direct to S3's endpoints).
 
 
-Task 4: read:
-https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html
-and create a policy allowing write access to the user GIFmaker on AWS account ... (Tom).
+#### Task 4:
+* read https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html
+and create a policy allowing write access to the user GIFmaker on AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` or  (Tom).  
 Before Clicking 'Review Policy', view the JSON of the policy to get an idea of what a populated policy looks like.
 
 
-Extras 1:
-Test each others' security skills by trying to exceed the access you have on their app (this could be your partner or anyone who has started out on extras 1)
+#### Extras 1:
+* Test each others' security skills by trying to exceed the access you have on their app (this could be your partner or anyone who has started out on extras 1)
 
-Extras 2:
-Experiment with Access Analyzer and Trusted Advisor's Bucket Permissions check
+#### Extras 2:
+* Compare Access Analyzer and Trusted Advisor's Bucket Permissions check
 
-Before the end, if anyone has accidentally exposed SECRET keys, stick around and revoke them!
+#### Before going home:
+* if you has accidentally exposed SECRET keys, make sure you revoke them!

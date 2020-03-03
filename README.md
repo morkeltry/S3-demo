@@ -149,19 +149,21 @@ By convention, `.env` or similar is a file we store environment variables, inclu
 #### Task 1:
 You used the IAM Console to grant the public read access to the first bucket using a Statement generated in JSON by the Policy Generator. You can use the Policy Generator generator to generate the write permissions to the User you created too, but be careful of how much of the generated policy you cut and paste.
 
-#### Task 2 research: Your team of consultants has reached a milestone and will hand over access to the client (ie a different company). How would you grant appropriate permissions to only this app's buckets, to only your client's AWS user?
+#### Task 2 research: 
+Your team of consultants has reached a milestone and will hand over access to the client (ie a different company).  
+How would you grant appropriate permissions to only this app's buckets, to only your client's AWS user?
 
 #### Task 2: pair with someone who is starting task 2 and grant them access to the second bucket.
 You will need to grant the `GetObject` permission and also the `ListBucket` permissions to your User in your AWS account. `GetObject` is a permission that acts on an object resource, or a set of object resources, and `ListBucket`, as it sounds, acts on an entire bucket. So the resources will have slightly different ARNs.
 
-Grant read access to AWS account ... (Tom)
+* Grant read access to AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` (Tom).
 You should now have: One bucket which any user on the internet can use, without authenticating, but to which no-one but you can write; Another bucket, which yourself and your client can read and write to, and Tom can read from, with no further permissions than those.
 
 #### Task 3:
-In `index.js`, delete or comment out each filename in the `picUrls` array. This should make the app search the bucket for files it can display - as long as it has permissions to!
-In upload.js, set bucketName. Notice that this is a variable for AWS to process internally, passed ot it by the SDK. So this is just the name of the bucket, not an internet-accessible URL.
-Grab some more pictures from the internet and store them in the assets/ folder.
-Run the upload app (`node upload.js`), to upload pictures to your pair's bucket one by one. Before each upload, though, you will need to set filePath to the local filename.
+* In `index.js`, delete or comment out each filename in the `picUrls` array. This should make the app search the bucket for files it can display - as long as it has permissions to!
+* In upload.js, set bucketName. Notice that this is a variable for AWS to process internally, passed ot it by the SDK. So this is just the name of the bucket, not an internet-accessible URL.
+* Grab some more pictures from the internet and store them in the assets/ folder.
+* Run the upload app (`node upload.js`), to upload pictures to your pair's bucket one by one. Before each upload, though, you will need to set filePath to the local filename.
 
 
 NB: In a large scale system, we would Block Public Access even to an S3 bucket which we _want_ the public to access, and the public access point would instead go through CloudFront. Mediating requests through CloudFront means you have full control over access control and logging and, especially, load-balancing (which you could not use when requests go direct to S3's endpoints).
@@ -169,7 +171,7 @@ NB: In a large scale system, we would Block Public Access even to an S3 bucket w
 
 #### Task 4:
 * read https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html
-and create a policy allowing write access to the user GIFmaker on AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` or  (Tom).  
+and create a policy allowing write access to the user GIFmaker on AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` (Tom).  
 Before Clicking 'Review Policy', view the JSON of the policy to get an idea of what a populated policy looks like.
 
 

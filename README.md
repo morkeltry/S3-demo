@@ -22,85 +22,89 @@ Pricing:
 So what use cases would S3 be suitable for?
 
 
-Preparation:
+### Preparation:
+###### (Wednesday)
 
-If you are able, and you haven't already, install the AWS CLI (version 2)
-https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-Make sure you are logged in on github and fork this workshop (using a different name for the repo) and pull it down to your local machine.
-go to  
+* If you are able, and you haven't already, [install the AWS CLI (version 2)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html). 
+* Make sure you are logged in on github and fork this workshop (using a different name for the repo) and pull it down to your local machine.
+* Go to  
 https://console.aws.amazon.com/billing/home?#/account
 and note your numeric AWS account ID in the accounts.txt file.
 
-First we will set up the AWS CLI, but for the CLI to authenticate itself to AWS, it will need credentials, that is to say - we will need to make it a User
+First we will set up the AWS CLI, but for the CLI to authenticate itself to AWS, it will need credentials, that is to say - we will need to make it a User. 
 This is done in an AWS Service called Identity And Management (IAM)
-Navigate to the IAM console, create a user with both Programmatic Access and Console Access and add the 'existing policy' called `AdministratorAccess`. Make sure you note down the Secret Access Key.
+* Navigate to the IAM console, create a user with both Programmatic Access and Console Access and add the 'existing policy' called `AdministratorAccess`. Make sure you note down the Secret Access Key.
 
-This policy is, as you would expect, the most powerful access you can have other than the root account (which you are currently logged into). It is good practice to avoid logging into the root account, so we have delegated all its permissions to this new user. AWS encourages this kind of security thinking because AWS accounts can be so valuable and control such cricital resources that risks which may be improbable, such as keyloggers even in well-secured premises, need to be taken seriously.
+This policy is, as you would expect, the most powerful access you can have other than the root account (which you are currently logged into). It is good practice to avoid logging into the root account, so we have delegated all its permissions to this new user. AWS encourages this kind of security thinking because AWS accounts can be so valuable and control such critical resources that risks which may be improbable, such as keyloggers even in well-secured premises, need to be taken seriously.
 
-You should use this new user to log into the AWS Console in future. We have also given the user Programmatic Access so that we can use it with the AWS CLI. The CLI doesn't use a password. Instead it uses Access Keys. If you don't want the keys to your admin account hanging around on your machine, you can remove Programmatic Access at the end of the week, or revoke the Access Keys.
+You should use this new user to log into the AWS Console in future. We have also given the user Programmatic Access so that we can use it with the AWS CLI. The CLI doesn't use a password to authenticate. Instead it uses Access Keys. If you don't want the keys to your admin account hanging around on your machine, you can remove Programmatic Access at the end of the week, or revoke the Access Keys.
 
 
-You're now ready to set up the AWS CLI with `aws configure` (see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration and use `eu-west-2` as your default region)
+You're now ready to set up the AWS CLI with `aws configure` (see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration and use `eu-west-2` as your default region).
 Don't lose the secret key, as you will not be able to view it again.
 Any time you want to check that your AWS CLI is configured, you can `aws sts get-caller-identity`, which makes a CLI call that does not require any special permissions.
-- setting up the AWS CLI will save you time hunting around the AWS console if you need to perform very simple tasks quickly in future. However, for most tasks this week we'll use the AWS console - so you become familiar with the console and its many options.
+
+Setting up the AWS CLI will save you time hunting around the AWS console if you need to perform very simple tasks quickly in future. However, for most tasks this week we'll use the AWS console - so you become familiar with the console and its many options.
 
 
+### S3
+##### (Thursday afternoon)
 
-S3:
-make two buckets.
-You can choose to add one alias to your account instead of the Account ID.
-Either go to
-https://console.aws.amazon.com/iam/home#/home and click cusotmise, or run aws create-alias in the terminal.
-Add both bucket names (and your alias if you made one) to accounts.txt, add commit, push.
+* Create an S3 bucket
+* Create another S3 bucket!
+* You can choose to add one alias to your account instead of the Account ID.
+ (Either go to https://console.aws.amazon.com/iam/home#/home and click customise, or run `aws create-alias` in the terminal.
+* Add both bucket names (and your alias if you made one) to accounts.txt, add commit, push.
 
-
-NB Why is 'Do not grant public read access' recommended ?
+*Question* - Why is 'Do not grant public read access' recommended ?
 
 tangent : Permissions
-S3 permissions Tab
-What do we mean by “Everyone” and “Any authenticated AWS user”
+
+#### S3
+
+What do we mean by “Everyone” and “Any authenticated AWS user” ?
 permissions on permissions - ACL list?
 
 examples:
 Jam cams!
 
 
-File uploader / noticeboard app.
+#### File uploader / noticeboard app.
 
-We will use a simple wepage to access pictures we have uploaded to an S3 bucket.
-To start experimenting, grab a picture (or any file you can display in a browaser) from the internet, upload it to the bucket.
-When you navigate to the picture's URL (ie, on the internet), you'll hit Access Denied.
-But keep the tab open, we'll be coming back.
+We will use a simple webpage to access pictures we have uploaded to an S3 bucket.
+###### To start experimenting: 
+* grab a picture (or any file you can display in a browser) from the internet, upload it to the bucket.
+* navigate to the picture's URL (ie, on the internet).  You'll hit Access Denied, but keep the tab open, we'll be coming back.
 
-Go to both 'Block public access' in the left pane, and to the Permissions tab of your bucket, and ensure that public access is NOT blocked in either.
-Even though these two permission locations have the same name, they work at two different levels. If either of them are turned on (ie are blocking), then access will be blocked.
-These are example of 'explicit deny' policies. Explicit deny always takes priority. Anywhere AWS encounters an explicit deny that relates to the action and resource you want, it will block access, no matter how many `allow`s it also encounters.
-Check out the Access Control List - ACLs are another layer of 'explicit deny'. Luckily, in this default ACL, no denials are set.
+* Go to both 'Block public access' in the left pane, and to the Permissions tab of your bucket, and ensure that public access is NOT blocked in either.
+Even though these two permission locations have the same name, they work at two different levels. If either of them are turned on (ie are blocking), then access will be blocked.  
+These are example of 'explicit deny' policies. Explicit deny always takes priority. Anywhere AWS encounters an explicit deny that relates to a given action and resource, it will block access, no matter how many `allow`s it also encounters.
+* Check out the Access Control List - ACLs are another layer of 'explicit deny'. Luckily, in this default ACL, no denials are set.
 
-Now try to navigate to the picture's URL.
+* Now try to navigate to the picture's URL.  
 It's still Access Denied.
 
 Even though we didn't block public access, we didn't allow it either.
 This is an example of AWS's 'default deny' policy.
 
-We'll need generate a policy that allows the public access.
-Before we do this, go to the list of buckets and click the checkbox for your bucket so that we can Copy Bucket ARN.
-Click on the bucket name again and go back to the Permission Tab.
-Find the Policy Generator (open it in a new tab) and add a Get Object action to a statement for the `*` Principal (`*` means everyone).
+###### We'll need generate a policy that allows the public access.
+Before we do this:
+* Go to the list of buckets and click the checkbox for your bucket so that we can Copy Bucket ARN.
+* Click on the bucket name again and go back to the Permission Tab.
+* Find the Policy Generator (open it in a new tab) and add a Get Object action to a statement for the `*` Principal (`*` means everyone).  
 When entering the ARN, you can compare it with the general form of the ARN in grey under the ARN textbox, and see how it is composed. It's not a pretty naming system. Imagine trying to work out what went wrong if you accidentally missed a colon out of the ARN :(
-Copy the JSON the Policy Generator generates and paste it into the editor.
-You are almost ready to save the policy but there is one last gotcha -
-The ARN you copied refers to the bucket, not to the objects in the bucket. The ARN naming system for S3 works a little like filenames on a disk - there are (conceptually, even if not in reality) folders separated by `/` and you can use the wildcard `*`.
-So `arn:aws:s3:::app-that-makes-ya-go-aw` refers to a bucket, `arn:aws:s3:::app-that-makes-ya-go-aw/` refers to a folder and `arn:aws:s3:::app-that-makes-ya-go-aw/*` refers to all of the resources (including subfolders) within that folder.
+* Copy the JSON the Policy Generator generates and paste it into the editor.  
+You are almost ready to save the policy but there is one last gotcha -  
+The ARN you copied refers to the bucket, not to the objects in the bucket. The ARN naming system for S3 works a little like filenames on a disk - there are (conceptually, even if not in reality) folders separated by `/` and you can use the wildcard `*`.  
+So `arn:aws:s3:::app-that-makes-ya-go-aw` refers to a bucket, `arn:aws:s3:::app-that-makes-ya-go-aw/` refers to a folder and `arn:aws:s3:::app-that-makes-ya-go-aw/*` refers to all of the resources (including subfolders) within that folder.  
 Once you've edited the policy to allow `*` access to the resources in the bucket and saved it, you should be able to access the picture via its URL.
 
-Check out the Access Analyzer for your S3 (in your region)
-https://s3.console.aws.amazon.com/s3/access?region=eu-west-2
+###### Check out the Access Analyzer for your S3 (in your region)
+https://s3.console.aws.amazon.com/s3/access?region=eu-west-2 \
 There won't be an Analyzer set up yet, so click through.
 In the messages at the top of the screen, you should see the blue message 'Scanning Resources'.
 
-Since we have allowed some public access to the bucket, AWS sees this as a potential security problem. Since we intended this bucket to be for public access, this is fine.
+We have allowed some public access to the bucket. AWS sees this as a potential security problem but, since we intended this bucket to be for public access, this is fine.  
 
 You can return to this page at the same URL, but this won't make the Analyzer rescan. To reach the option to Rescan, you need to click on a 'finding' in the lists in one of the tabs.
 If you don't have any 'findings', it means your bucket is secured against public access (but also means that you'll need to delete and recreate the Analyzer in 'Analyzer details' if you want to force a rescan).

@@ -27,15 +27,15 @@ So what use cases would S3 be suitable for?
 
 * If you are able, and you haven't already, [install the AWS CLI (version 2)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html). 
 * Make sure you are logged in on github and fork this workshop (using a different name for the repo) and pull it down to your local machine.
-* Go to  
-https://console.aws.amazon.com/billing/home?#/account
+* If you have an AWS account of your own, then log into it. If not, then follow as much of this preparation as you can with the sandbox environment in Vocareum.
+* Go to https://console.aws.amazon.com/billing/home?#/account
 and note your numeric AWS account ID in the accounts.txt file.
 
 First we will set up the AWS CLI, but for the CLI to authenticate itself to AWS, it will need credentials, that is to say - we will need to make it a User. 
 This is done in an AWS Service called Identity And Management (IAM)
 * Navigate to the IAM console, create a user with both Programmatic Access and Console Access and add the 'existing policy' called `AdministratorAccess`. Make sure you note down the Secret Access Key.
 
-This policy is, as you would expect, the most powerful access you can have other than the root account (which you are currently logged into). It is good practice to avoid logging into the root account, so we have delegated all its permissions to this new user. AWS encourages this kind of security thinking because AWS accounts can be so valuable and control such critical resources that risks which may be improbable, such as keyloggers even in well-secured premises, need to be taken seriously.
+This policy is, as you would expect, the most powerful access you can have other than the root account (which you are currently logged into). It is good practice to avoid logging into the root account, so we have delegated all its permissions to this new user. AWS encourages this kind of security thinking because AWS accounts can be so valuable and control such critical resources that even risks which may be improbable, such as keyloggers even in well-secured premises, need to be taken seriously.
 
 You should use this new user to log into the AWS Console in future. We have also given the user Programmatic Access so that we can use it with the AWS CLI. The CLI doesn't use a password to authenticate. Instead it uses Access Keys. If you don't want the keys to your admin account hanging around on your machine, you can remove Programmatic Access at the end of the week, or revoke the Access Keys.
 
@@ -60,6 +60,9 @@ Setting up the AWS CLI will save you time hunting around the AWS console if you 
 
 tangent : Permissions
 
+Notice that we didn't set up a VPC, as we did in most of the labs.  
+S3 is called 'simple' partly because, as well as being elastically scalable, the architectural decisions about availability and connectivity are done behind the scenes.
+
 #### S3
 
 What do we mean by “Everyone” and “Any authenticated AWS user” ?
@@ -82,8 +85,8 @@ These are example of 'explicit deny' policies. Explicit deny always takes priori
 * Check out the Access Control List - ACLs are another layer of 'explicit deny'. Luckily, in this default ACL, no denials are set.
 
 * Now try to navigate to the picture's URL.  
-It's still Access Denied.
 
+Trying to navigate to the image, you will find you still get still Access Denied.  
 Even though we didn't block public access, we didn't allow it either.
 This is an example of AWS's 'default deny' policy.
 
@@ -91,18 +94,21 @@ This is an example of AWS's 'default deny' policy.
 Before we do this:
 * Go to the list of buckets and click the checkbox for your bucket so that we can Copy Bucket ARN.
 * Click on the bucket name again and go back to the Permission Tab.
-* Find the Policy Generator (open it in a new tab) and add a Get Object action to a statement for the `*` Principal (`*` means everyone).  
+* Find the Policy Generator (open it in a new tab) and add a Get Object action to a statement for the `*` Principal (NB: `*` means everyone).  
 When entering the ARN, you can compare it with the general form of the ARN in grey under the ARN textbox, and see how it is composed. It's not a pretty naming system. Imagine trying to work out what went wrong if you accidentally missed a colon out of the ARN :(
 * Copy the JSON the Policy Generator generates and paste it into the editor.  
 You are almost ready to save the policy but there is one last gotcha -  
 The ARN you copied refers to the bucket, not to the objects in the bucket. The ARN naming system for S3 works a little like filenames on a disk - there are (conceptually, even if not in reality) folders separated by `/` and you can use the wildcard `*`.  
-So `arn:aws:s3:::app-that-makes-ya-go-aw` refers to a bucket, `arn:aws:s3:::app-that-makes-ya-go-aw/` refers to a folder and `arn:aws:s3:::app-that-makes-ya-go-aw/*` refers to all of the resources (including subfolders) within that folder.  
+So: `arn:aws:s3:::app-that-makes-ya-go-aw` refers to a bucket,  
+`arn:aws:s3:::app-that-makes-ya-go-aw/` refers to a folder 
+and `arn:aws:s3:::app-that-makes-ya-go-aw/*` refers to all of the resources (including subfolders) within that folder.  
 Once you've edited the policy to allow `*` access to the resources in the bucket and saved it, you should be able to access the picture via its URL.
 
-![Not the policy you need :P](https://raw.githubusercontent.com/morkeltry/S3-demo/master/assets/S3%20policies.png)
+![Not the policy you need :P](https://raw.githubusercontent.com/morkeltry/S3-demo/master/assets/S3%20policies.png)*An S3 bucket policy yesterday*
+
 
 ###### Check out the Access Analyzer for your S3 (in your region)
-https://s3.console.aws.amazon.com/s3/access?region=eu-west-2 \
+Go to https://s3.console.aws.amazon.com/s3/access?region=eu-west-2 \
 There won't be an Analyzer set up yet, so click through to create it.
 In the messages at the top of the screen, you should see the blue message 'Scanning Resources'.
 
@@ -158,17 +164,17 @@ How would you grant appropriate permissions to only this app's buckets, to only 
 #### Task 2: pair with someone who is starting task 2 and grant them access to the second bucket.
 You will need to grant the `GetObject` permission and also the `ListBucket` permissions to your User in your AWS account. `GetObject` is a permission that acts on an object resource, or a set of object resources, and `ListBucket`, as it sounds, acts on an entire bucket. So the resources will have slightly different ARNs.
 
-* Grant read access to AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` (Tom).
+* Grant read access to AWS account `ec4f19089da38e120cba5f19d592e8de7a57b253900658d86b076670a46ba371` (Tom).  
 You should now have: One bucket which any user on the internet can use, without authenticating, but to which no-one but you can write; Another bucket, which yourself and your client can read and write to, and Tom can read from, with no further permissions than those.
 
 #### Task 3:
-* In `index.js`, delete or comment out each filename in the `picUrls` array. This should make the app search the bucket for files it can display - as long as it has permissions to!
-* In upload.js, set bucketName. Notice that this is a variable for AWS to process internally, passed ot it by the SDK. So this is just the name of the bucket, not an internet-accessible URL.
-* Grab some more pictures from the internet and store them in the assets/ folder.
+* In `index.js`, delete or comment out each filename in the `picUrls` array. The JS is written so that if this array is empty, the app will search the bucket for files it can display - as long as it has permissions to!
+* In `upload.js`, set `bucketName`. Notice that this is a variable for AWS to process internally, once we pass it to AWS through the SDK. So this is just the name of the bucket, not an internet-accessible URL.
+* Grab some more pictures from the internet and store them in the `assets/` folder.
 * Run the upload app (`node upload.js`), to upload pictures to your pair's bucket one by one. Before each upload, though, you will need to set filePath to the local filename.
 
 
-NB: In a large scale system, we would Block Public Access even to an S3 bucket which we _want_ the public to access, and the public access point would instead go through CloudFront. Mediating requests through CloudFront means you have full control over access control and logging and, especially, load-balancing (which you could not use when requests go direct to S3's endpoints).
+NB: In a large scale system, we would Block Public Access even to an S3 bucket which we _want_ the public to access, and the public access point would instead go through CloudFront. Mediating requests through CloudFront means you have full control over access control and logging and, especially, load-balancing (even if load-balancing itself is mostly taken care of by S3, there are other functions of load-balancers which you could not use if you were to direct customers direct to S3's endpoints).
 
 
 #### Task 4:
@@ -181,7 +187,7 @@ Before Clicking 'Review Policy', view the JSON of the policy to get an idea of w
 * Test each others' security skills by trying to exceed the access you have on their app (this could be your partner or anyone who has started out on extras 1)
 
 #### Extras 2:
-* Compare Access Analyzer and Trusted Advisor's Bucket Permissions check
+* Compare Access Analyzer and Trusted Advisor's Bucket Permissions check.
 
 #### Before going home:
 * if you has accidentally exposed SECRET keys, make sure you revoke them!

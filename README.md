@@ -1,26 +1,5 @@
-
-first section - put on slides?
-What is S3:
-
-meaning of bucket
-
-block v file storage
-'object' storage = 3rd way of looking at it -
-
-AWS def of bucket purpose
-
-key features (revise these!)
-but esp, REST / file-like access
-flat - you look it up by its name, not its position in a hierarchy (so they say)
-because it is flat, it stores the information about itself 'in' itself using metadata
-because it is looked up by name not position, you don't need to think about where to find the data, or the most efficient way to organise storing it.
-
-Pricing:
-    Storage cost: ~ $0.025 / GB / month, for 'warm' access, hourly billing = pay-as-you-use
-    API cost for operation of files: ~$0.005 / 10000 read requests, write requests are 10 times more expensive
-    Data transfer outside of AWS region: ~$0.02 / GB within AWS, ~$0.08 / GB to the internet.
-So what use cases would S3 be suitable for?
-
+# S3 demo workshop
+#### Make an app which uses S3 for its photo storage.
 
 ### Preparation:
 ###### (Wednesday)
@@ -56,21 +35,10 @@ Setting up the AWS CLI will save you time hunting around the AWS console if you 
  (Either go to https://console.aws.amazon.com/iam/home#/home and click customise, or run `aws create-alias` in the terminal.
 * Add both bucket names (and your alias if you made one) to accounts.txt, add commit, push.
 
-*Question* - Why is 'Do not grant public read access' recommended ?
-
-tangent : Permissions
-
 Notice that we didn't set up a VPC, as we did in most of the labs.  
 S3 is called 'simple' partly because, as well as being elastically scalable, the architectural decisions about availability and connectivity are done behind the scenes.
 
 #### S3
-
-What do we mean by “Everyone” and “Any authenticated AWS user” ?
-permissions on permissions - ACL list?
-
-examples:
-Jam cams!
-
 
 #### File uploader / noticeboard app.
 

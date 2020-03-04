@@ -99,6 +99,8 @@ The ARN you copied refers to the bucket, not to the objects in the bucket. The A
 So `arn:aws:s3:::app-that-makes-ya-go-aw` refers to a bucket, `arn:aws:s3:::app-that-makes-ya-go-aw/` refers to a folder and `arn:aws:s3:::app-that-makes-ya-go-aw/*` refers to all of the resources (including subfolders) within that folder.  
 Once you've edited the policy to allow `*` access to the resources in the bucket and saved it, you should be able to access the picture via its URL.
 
+![alt text](https://raw.githubusercontent.com/morkeltry/S3-demo/master/assets/S3%20policies.png)
+
 ###### Check out the Access Analyzer for your S3 (in your region)
 https://s3.console.aws.amazon.com/s3/access?region=eu-west-2 \
 There won't be an Analyzer set up yet, so click through to create it.

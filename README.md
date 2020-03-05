@@ -6,7 +6,7 @@
 
 * If you are able, and you haven't already, [install the AWS CLI (version 2)](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html). 
 * Make sure you are logged in on github and fork this workshop (using a different name for the repo) and pull it down to your local machine.
-* If you have an AWS account of your own, then log into it. If not, then follow as much of this preparation as you can with the sandbox environment in Vocareum.
+* Set up an AWS account and log into it. 
 * Go to https://console.aws.amazon.com/billing/home?#/account
 and note your numeric AWS account ID in the accounts.txt file.
 
